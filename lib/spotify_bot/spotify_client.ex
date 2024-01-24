@@ -1,6 +1,13 @@
 defmodule SpotifyBot.SpotifyClient do
+  @moduledoc """
+  Spotify API Client.
+  """
+
   @base_url "https://api.spotify.com/v1"
 
+  @doc """
+  Get an access token using the refresh token.
+  """
   def get_access_token!(client_id, client_secret, refresh_token) do
     Req.post!(
       url: "https://accounts.spotify.com/api/token",
@@ -9,9 +16,12 @@ defmodule SpotifyBot.SpotifyClient do
         grant_type: "refresh_token",
         refresh_token: refresh_token
       }
-    )
+    ).body
   end
 
+  @doc """
+  Get the info for a track by the spotify link or track ID.
+  """
   def get_track!("https://open.spotify.com/track/" <> rest) do
     rest
     |> String.split("?")
@@ -23,12 +33,15 @@ defmodule SpotifyBot.SpotifyClient do
     Req.get!(client(), url: "/tracks/#{id}").body
   end
 
+  @doc """
+  Add a track to the next position in the now-playing queue.
+  """
   def add_track_to_queue!(track_id) do
     Req.post!(client(),
       url: "/me/player/queue",
       headers: %{"content-length" => 0},
       params: [uri: "spotify:track:#{track_id}"]
-    )
+    ).body
   end
 
   # ----------------------------------------------------------------------------
@@ -47,7 +60,7 @@ defmodule SpotifyBot.SpotifyClient do
       refresh_token: refresh_token
     } = Application.fetch_env!(:spotify_bot, __MODULE__) |> Map.new()
 
-    token = get_access_token!(client_id, client_secret, refresh_token).body["access_token"]
+    token = get_access_token!(client_id, client_secret, refresh_token)["access_token"]
 
     Req.Request.put_header(request, "authorization", "Bearer #{token}")
   end
