@@ -6,13 +6,12 @@ config :spotify_bot, SpotifyBot.SpotifyClient,
   refresh_token: System.fetch_env!("SPOTIFY_REFRESH_TOKEN")
 
 config :spotify_bot,
-  bot:
-    [
-      bot: SpotifyBot,
-      user: System.fetch_env!("TWITCH_USER"),
-      pass: System.fetch_env!("TWITCH_OAUTH_TOKEN"),
-      channels: [System.fetch_env!("TWITCH_USER")]
-    ]
+  bot: [
+    bot: SpotifyBot,
+    user: System.fetch_env!("TWITCH_USER"),
+    pass: System.fetch_env!("TWITCH_OAUTH_TOKEN"),
+    channels: [System.fetch_env!("TWITCH_USER")]
+  ]
 
 # config/runtime.exs is executed for all environments, including
 # during releases. It is executed after compilation and before the

@@ -1,5 +1,4 @@
 defmodule SpotifyBot.SpotifyClient do
-
   @base_url "https://api.spotify.com/v1"
 
   def get_access_token!(client_id, client_secret, refresh_token) do
@@ -42,10 +41,11 @@ defmodule SpotifyBot.SpotifyClient do
   end
 
   defp add_token(request) do
-    config = Application.fetch_env!(:spotify_bot, __MODULE__)
-    client_id = Keyword.fetch!(config, :client_id)
-    client_secret = Keyword.fetch!(config, :client_secret)
-    refresh_token = Keyword.fetch!(config, :refresh_token)
+    %{
+      client_id: client_id,
+      client_secret: client_secret,
+      refresh_token: refresh_token
+    } = Application.fetch_env!(:spotify_bot, __MODULE__) |> Map.new()
 
     token = get_access_token!(client_id, client_secret, refresh_token).body["access_token"]
 

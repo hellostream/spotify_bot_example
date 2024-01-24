@@ -45,7 +45,6 @@ defmodule SpotifyBot.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
       {:plug_cowboy, "~> 2.5"},
-
       {:twitch_chat, github: "hellostream/twitch_chat", branch: "main"},
       {:req, "~> 0.4.0"}
     ]
