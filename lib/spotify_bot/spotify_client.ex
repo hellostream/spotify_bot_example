@@ -34,6 +34,19 @@ defmodule SpotifyBot.SpotifyClient do
   end
 
   @doc """
+  Get the current song and queue.
+  """
+  @spec get_queue!() :: {current_track_id :: String.t(), queue :: [String.t()]}
+  def get_queue! do
+    %{
+      "currently_playing" => %{"id" => track_id},
+      "queue" => queue
+    } = Req.get!(client(), url: "/me/player/queue").body
+
+    {track_id, Enum.map(queue, & &1["id"])}
+  end
+
+  @doc """
   Add a track to the next position in the now-playing queue.
   """
   def add_track_to_queue!(track_id) do
