@@ -110,11 +110,7 @@ defmodule SpotifyBot.SongQueue do
     {current_track, actual_tracks} = SpotifyBot.SpotifyClient.get_queue!()
     queue = sync_queue(state.queue, current_track, actual_tracks)
     total = Enum.count(queue)
-
-    user_count =
-      Enum.reduce(queue, 0, fn {u, _}, acc ->
-        if user == u, do: acc + 1, else: acc
-      end)
+    user_count = Enum.count(queue, &match?({_, ^user}, &1))
 
     cond do
       total >= state.max_total ->
@@ -136,18 +132,18 @@ defmodule SpotifyBot.SongQueue do
     {:reply, Enum.count(state.queue), state}
   end
 
-  defp sync_queue(queue, current, tracks) do
+  defp sync_queue(current_queue, current_track, actual_queue) do
     # We reverse it so that `List.keytake/3` will return the last occurence
     # instead of the first.
-    queue = Enum.reverse(queue)
+    current_queue = Enum.reverse(current_queue)
 
     # The actual tracks are the source of truth. Go through these ones and
     # check for existing queue entries that match the tracks. If it exists in
     # the existing queue, it stays, if not, it gets added with a `nil` user.
     # Any tracks that are left over in the existing queue are not included.
     {queue, _} =
-      [current | tracks]
-      |> Enum.reduce({[], queue}, fn track_id, {acc, queue} ->
+      [current_track | actual_queue]
+      |> Enum.reduce({[], current_queue}, fn track_id, {acc, queue} ->
         case List.keytake(queue, track_id, 0) do
           {item, queue} ->
             {[item | acc], queue}
