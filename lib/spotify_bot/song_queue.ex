@@ -149,7 +149,7 @@ defmodule SpotifyBot.SongQueue do
             {[item | acc], queue}
 
           nil ->
-            {[{track_id, nil} | acc], queue}
+            {acc, queue}
         end
       end)
 

@@ -1,14 +1,8 @@
 defmodule SpotifyBot do
   @moduledoc """
-  SpotifyBot keeps the contexts that define your domain
-  and business logic.
-
-  Contexts are also responsible for managing your data, regardless
-  if it comes from the database, an external API or others.
+  SpotifyBot is a Twitch chat bot for adding songs to a Spotify play queue.
   """
   use TwitchChat.Bot
-
-  require Logger
 
   alias SpotifyBot.SongQueue
   alias SpotifyBot.SpotifyClient
