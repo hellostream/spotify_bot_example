@@ -34,6 +34,14 @@ defmodule SpotifyBot.SpotifyClient do
   end
 
   @doc """
+  Get the current song.
+  """
+  @spec get_current_track!() :: map()
+  def get_current_track! do
+    Req.get!(client(), url: "/me/player/currently-playing").body
+  end
+
+  @doc """
   Get the current song and queue.
   """
   @spec get_queue!() :: {current_track_id :: String.t(), queue :: [String.t()]}

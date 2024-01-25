@@ -29,4 +29,15 @@ defmodule SpotifyBot do
         say(channel, "@#{user} must be a single spotify track link")
     end
   end
+
+  def handle_event(%Message{message: "!spotify song", channel: channel, display_name: user}) do
+    case SpotifyClient.get_current_track!() do
+      %{"is_playing" => true, "item" => track} ->
+        artists = Enum.map_join(track["artists"], ", ", & &1["name"])
+        say(channel, "@#{user} currently playing 『#{artists} - #{track["name"]}』")
+
+      _track ->
+        say(channel, "@#{user} nothing is playing")
+    end
+  end
 end
