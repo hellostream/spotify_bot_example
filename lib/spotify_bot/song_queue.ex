@@ -5,7 +5,7 @@ defmodule SpotifyBot.SongQueue do
   # Defaults.
   @allow_consecutive false
   @max_per_user 2
-  @max_total 100
+  @max_total 50
 
   @doc """
   Start the song queue server.
@@ -51,11 +51,11 @@ defmodule SpotifyBot.SongQueue do
   end
 
   @doc """
-  Get the size of the current queue.
+  Get the length of the current queue.
   """
-  @spec size() :: non_neg_integer()
-  def size do
-    GenServer.call(__MODULE__, :size)
+  @spec length() :: non_neg_integer()
+  def length do
+    GenServer.call(__MODULE__, :length)
   end
 
   # ----------------------------------------------------------------------------
@@ -69,7 +69,6 @@ defmodule SpotifyBot.SongQueue do
       allow_consecutive?: Keyword.get(opts, :allow_consecutive?, @allow_consecutive),
       max_total: Keyword.get(opts, :max_total, @max_total),
       max_per_user: Keyword.get(opts, :max_per_user, @max_per_user),
-      count: 0,
       queue: []
     }
 
@@ -84,7 +83,7 @@ defmodule SpotifyBot.SongQueue do
         # I know this is stupid. I want to remove the last occurence and I
         # don't want to use my brain. I'm tired. Leave me alone.
         queue = Enum.reverse(state.queue) |> List.keydelete(track_id, 0)
-        %{state | count: state.count - 1, queue: Enum.reverse(queue)}
+        %{state | queue: Enum.reverse(queue)}
       else
         state
       end
@@ -94,12 +93,12 @@ defmodule SpotifyBot.SongQueue do
 
   def handle_cast({:remove_user, user}, state) do
     if List.keymember?(state.queue, user, 1) do
-      {queue, deleted} =
-        Enum.reduce(state.queue, {[], 0}, fn {track, u}, {queue, deleted} ->
-          if user == u, do: {queue, deleted + 1}, else: {[{track, u} | queue], deleted}
+      queue =
+        Enum.reduce(state.queue, [], fn {track, u}, queue ->
+          if user == u, do: queue, else: [{track, u} | queue]
         end)
 
-      {:noreply, %{state | count: state.count - deleted, queue: queue}}
+      {:noreply, %{state | queue: queue}}
     else
       {:noreply, state}
     end
@@ -124,34 +123,31 @@ defmodule SpotifyBot.SongQueue do
       user_count >= state.max_per_user ->
         {:reply, {:error, :max_per_user}, state}
 
-      match?({_, ^user}, hd(queue)) and not state.allow_consecutive? ->
+      match?([{_, ^user} | _], queue) and not state.allow_consecutive? ->
         {:reply, {:error, :no_consecutive}, state}
 
       true ->
         SpotifyBot.SpotifyClient.add_track_to_queue!(track_id)
-        {:reply, :ok, %{state | count: state.count + 1, queue: [{track_id, user} | queue]}}
+        {:reply, :ok, %{state | queue: [{track_id, user} | queue]}}
     end
   end
 
-  def handle_call(:size, _from, state) do
-    {:reply, state.count, state}
+  def handle_call(:length, _from, state) do
+    {:reply, Enum.count(state.queue), state}
   end
 
   defp sync_queue(queue, current, tracks) do
-    # Reverse the queue and remove the current track from the list.
     # We reverse it so that `List.keytake/3` will return the last occurence
     # instead of the first.
-    queue =
-      queue
-      |> Enum.reverse()
-      |> List.keydelete(current, 0)
+    queue = Enum.reverse(queue)
 
     # The actual tracks are the source of truth. Go through these ones and
     # check for existing queue entries that match the tracks. If it exists in
     # the existing queue, it stays, if not, it gets added with a `nil` user.
     # Any tracks that are left over in the existing queue are not included.
     {queue, _} =
-      Enum.reduce(tracks, {[], queue}, fn track_id, {acc, queue} ->
+      [current | tracks]
+      |> Enum.reduce({[], queue}, fn track_id, {acc, queue} ->
         case List.keytake(queue, track_id, 0) do
           {item, queue} ->
             {[item | acc], queue}

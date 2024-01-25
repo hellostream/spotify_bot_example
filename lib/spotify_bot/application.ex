@@ -15,7 +15,7 @@ defmodule SpotifyBot.Application do
       # {SpotifyBot.Worker, arg},
       # Start to serve requests, typically the last entry
       SpotifyBotWeb.Endpoint,
-      SpotifyBot.SongQueue,
+      {SpotifyBot.SongQueue, Application.get_env(:spotify_bot, SpotifyBot.SongQueue, [])},
       {TwitchChat.Supervisor, Application.fetch_env!(:spotify_bot, :bot)}
     ]
 

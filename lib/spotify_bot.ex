@@ -12,6 +12,7 @@ defmodule SpotifyBot do
 
   alias SpotifyBot.SongQueue
   alias SpotifyBot.SpotifyClient
+
   alias TwitchChat.Events.Message
 
   @impl true
@@ -31,7 +32,7 @@ defmodule SpotifyBot do
         end
 
       _ ->
-        say(channel, "@#{user} must be a single spotify track")
+        say(channel, "@#{user} must be a single spotify track link")
     end
   end
 end

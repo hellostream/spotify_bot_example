@@ -1,5 +1,11 @@
 import Config
 
+# # You could override the default song queue configuration here.
+# config :spotify_bot, SpotifyBot.SongQueue,
+#   max_total: 10,
+#   max_per_user: 2,
+#   allow_consecutive?: false
+
 config :spotify_bot, SpotifyBot.SpotifyClient,
   client_id: System.fetch_env!("SPOTIFY_CLIENT_ID"),
   client_secret: System.fetch_env!("SPOTIFY_CLIENT_SECRET"),
