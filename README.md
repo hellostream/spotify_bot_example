@@ -37,3 +37,6 @@ To get the twitch oauth token, you can use https://twitchapps.com/tmi/
 ```
 !spotify add https://open.spotify.com/track/0sUuhbkGnJk6ZjSQJmZY9d?si=3ec1fcbd64364bb2
 ```
+```
+!spotify song
+```
