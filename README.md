@@ -30,6 +30,15 @@ To get the twitch oauth token, you can use https://twitchapps.com/tmi/
   * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
   * Start without phoenix with `mix run --no-halt` or inside IEx with `iex -S mix`
 
+## Developing/Customizing
+
+Edit this file
+ * https://github.com/hellostream/spotify_bot_example/blob/main/lib/spotify_bot.ex
+
+If you need to tweak any of the song queue stuff, it's here:
+
+ * https://github.com/hellostream/spotify_bot_example/blob/main/lib/spotify_bot/song_queue.ex
+
 ## Usage
 
 1. Start the bot after it's set up.
